@@ -1,0 +1,34 @@
+1. databases
+<DbCommand CommandType="Text" ModifiedByUser="true">
+                    <CommandText>SELECT      name, database_id
+FROM        sys.databases
+WHERE      (database_id &gt;= 5) AND (NOT (name LIKE N'ReportServer%'))
+ORDER BY NAME</CommandText>
+                    <Parameters />
+
+2. backup_devices
+SELECT        name
+FROM            sys.backup_devices
+
+3. SP_STT_BACKUP
+<CommandText>SELECT        position, name, backup_start_date, user_name, backup_set_id
+FROM            msdb.dbo.backupset
+WHERE        (database_name = @dbName) AND (type = 'D') AND (backup_set_id &gt;=
+                             (SELECT        MAX(backupset_2.backup_set_id) AS Expr1
+                               FROM            msdb.dbo.backupset AS backupset_2 INNER JOIN
+                                                             (SELECT        MAX(media_set_id) AS max_media_set_id, MIN(position) AS min_position
+                                                               FROM            msdb.dbo.backupset AS backupset_1
+                                                               WHERE        (database_name = @dbName) AND (type = 'D')) AS backupsetfilter ON backupset_2.media_set_id = backupsetfilter.max_media_set_id AND backupset_2.position = backupsetfilter.min_position))
+ORDER BY position DESC</CommandText>
+	
+
+4. backupset
+`         <CommandText>SELECT backup_set_id, media_set_id FROM msdb.dbo.backupset WHERE database_name=@dbName</CommandText>
+                    <Parameters>
+
+
+
+5.keys
+  <CommandText>SELECT restore_history_id
+FROM msdb.dbo.restorehistory
+WHERE backup_set_id = @backupSetId</CommandText>
